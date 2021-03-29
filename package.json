@@ -1,0 +1,28 @@
+{
+  "name": "lunchmoney-amazon-matcher",
+  "version": "1.0.0",
+  "description": "Match amazon order information to lunch money",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/jest": "^26.0.22",
+    "@types/node": "^14.14.37",
+    "@types/node-fetch": "^2.5.8",
+    "csv-parser": "^3.0.0",
+    "date-fns": "^2.19.0",
+    "dotenv": "^8.2.0",
+    "highlight.js": "^10.4.0",
+    "jest": "^26.6.3",
+    "node-fetch": "^2.6.1",
+    "query-string": "^7.0.0",
+    "ts-jest": "^26.5.4",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  }
+}
