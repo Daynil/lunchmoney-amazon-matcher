@@ -2,7 +2,7 @@ import csv from 'csv-parser';
 import { format, parse } from 'date-fns';
 import fs from 'fs';
 import { LunchmoneyTransaction, MatchedLunchmoneyTransaction } from './api';
-import { logger } from './util';
+import { generateTransactionNote, logger } from './util';
 
 export interface AmazonOrder {
   'Order Date': string;
@@ -172,6 +172,20 @@ export function matchLunchmoneyToAmazon(
     }
   }
   return matched;
+}
+
+export function enrichLMOrdersWithAmazonOrderDetails(
+  lmTransactions: LunchmoneyTransaction[],
+  amazonOrders: AmazonOrder[]
+): LunchmoneyTransaction[] {
+  const matched = matchLunchmoneyToAmazon(lmTransactions, amazonOrders);
+  return matched.map((matchedTransaction) => {
+    const { amazonGroupedOrder, lmTransaction } = matchedTransaction;
+    return {
+      ...lmTransaction,
+      notes: generateTransactionNote(amazonGroupedOrder, lmTransaction)
+    };
+  });
 }
 
 export async function start() {

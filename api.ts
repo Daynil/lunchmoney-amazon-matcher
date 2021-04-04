@@ -6,6 +6,7 @@ import { TestAmazonOrders } from './test-utils';
 import { logger } from './util';
 
 const baseUrl = 'https://dev.lunchmoney.app/v1';
+export const LM_API_MAX_NOTE_LENGTH = 350;
 
 dotenv.config();
 
@@ -86,13 +87,22 @@ async function client<T>(
   }
 }
 
-export async function getAmazonTransactions(): Promise<
+// TODO: add start and end dates, with input from command line args
+export async function getLMAmazonTransactions(): Promise<
   LunchmoneyTransaction[]
 > {
   return await client<LunchmoneyTransaction[]>('transactions', 'GET', {
     queryParams: {
       tag_id: process.env.AMAZON_TAG_ID
     }
+  });
+}
+
+export async function getLMTransaction(
+  id: number
+): Promise<LunchmoneyTransaction> {
+  return await client<LunchmoneyTransaction>('transaction', 'GET', {
+    param: id
   });
 }
 
@@ -161,4 +171,16 @@ export async function getTestCategoryId(): Promise<number> {
       })
     ).category_id;
   }
+}
+
+export async function updateLMTransaction(
+  transaction: LunchmoneyTransaction
+): Promise<LunchmoneyTransaction> {
+  await client<{ updated: boolean }>('transactions', 'PUT', {
+    param: transaction.id,
+    body: {
+      transaction
+    }
+  });
+  return await getLMTransaction(transaction.id);
 }
