@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { insertTestAmazonTransactions, LunchmoneyTransaction } from './api';
 import { AmazonOrder } from './script';
+import { logger } from './util';
 
 export const TestAmazonOrders: AmazonOrder[] = [
   {
@@ -97,14 +98,14 @@ export async function getTestTransactions(): Promise<LunchmoneyTransaction[]> {
       // @ts-ignore
       fs.readFileSync('./testTransactions.json')
     );
-    console.log('Test transactions loaded from cache.');
+    logger('Test transactions loaded from cache.', 'info');
   } else {
     testTransactions = await insertTestAmazonTransactions();
     fs.writeFileSync(
       './testTransactions.json',
       JSON.stringify(testTransactions)
     );
-    console.log('Test transactions inserted to and loaded from Lunchmoney.');
+    logger('Test transactions inserted to and loaded from Lunchmoney.', 'info');
   }
   return testTransactions;
 }

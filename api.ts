@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import fetch, { RequestInit } from 'node-fetch';
 import { stringify } from 'query-string';
 import { TestAmazonOrders } from './test-utils';
+import { logger } from './util';
 
 const baseUrl = 'https://dev.lunchmoney.app/v1';
 
@@ -109,7 +110,7 @@ export async function insertTestAmazonTransactions(): Promise<
       }
     });
   } catch (e) {
-    console.error('Test transaction insertion error', e);
+    logger(e, 'error');
   }
   return (
     await client<{ transactions: LunchmoneyTransaction[] }>(
