@@ -103,14 +103,13 @@ export async function insertTestAmazonTransactions(): Promise<
     category_id: testCategoryId
   }));
   try {
-    const t = await client<{ ids: number[] }>('transactions', 'POST', {
+    await client<{ ids: number[] }>('transactions', 'POST', {
       body: {
         transactions: forInsertion
       }
     });
-    console.log('inserted', t);
   } catch (e) {
-    console.log(e);
+    console.error('Test transaction insertion error', e);
   }
   return (
     await client<{ transactions: LunchmoneyTransaction[] }>(
@@ -118,7 +117,10 @@ export async function insertTestAmazonTransactions(): Promise<
       'GET',
       {
         queryParams: {
-          category_id: testCategoryId
+          category_id: testCategoryId,
+          // Test transactions fall on these two dates
+          start_date: '2021-03-21',
+          end_date: '2021-03-22'
         }
       }
     )
@@ -140,13 +142,15 @@ export async function getTestCategoryId(): Promise<number> {
   );
   if (testCategory) return testCategory.id;
   else {
-    return await client<number>('categories', 'POST', {
-      body: {
-        name: testCategoryName,
-        description: 'Category for Lunchmoney Amazon Matcher testing',
-        exclude_from_budget: true,
-        exclude_from_totals: true
-      }
-    });
+    return (
+      await client<{ category_id: number }>('categories', 'POST', {
+        body: {
+          name: testCategoryName,
+          description: 'Category for Lunchmoney Amazon Matcher testing',
+          exclude_from_budget: true,
+          exclude_from_totals: true
+        }
+      })
+    ).category_id;
   }
 }

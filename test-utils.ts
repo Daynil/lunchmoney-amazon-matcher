@@ -97,12 +97,14 @@ export async function getTestTransactions(): Promise<LunchmoneyTransaction[]> {
       // @ts-ignore
       fs.readFileSync('./testTransactions.json')
     );
+    console.log('Test transactions loaded from cache.');
   } else {
     testTransactions = await insertTestAmazonTransactions();
     fs.writeFileSync(
       './testTransactions.json',
       JSON.stringify(testTransactions)
     );
+    console.log('Test transactions inserted to and loaded from Lunchmoney.');
   }
   return testTransactions;
 }
