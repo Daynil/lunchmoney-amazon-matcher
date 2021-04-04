@@ -118,7 +118,7 @@ export async function parseAmazonOrderCSV(
 
 /**
  * In order to match Amazon orders with multiple items, we need to group them together.
- * Amazon returns one row per item, even if they were in the same transaction (order).
+ * Amazon purchase history returns one row per item, even if they were in the same transaction (order).
  * However, on credit card statements, and thus Lunchmoney, each order is lumped into 1 transactions, regardless of item count.
  * @param orders Original Amazon orders (1 row per item)
  */

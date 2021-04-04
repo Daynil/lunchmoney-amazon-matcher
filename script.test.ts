@@ -158,6 +158,7 @@ test('Amazon orders are grouped by Order ID with totals', () => {
 
 test('gets test transactions', async () => {
   const testTransactions = await getTestTransactions();
+  const groupedAmazonOrders = groupAmazonOrders(TestAmazonOrders);
   expect(
     testTransactions.map(({ date, amount, payee }) => ({
       date,
@@ -165,9 +166,9 @@ test('gets test transactions', async () => {
       amount: parseFloat(amount)
     }))
   ).toEqual(
-    TestAmazonOrders.map((order) => ({
+    groupedAmazonOrders.map((order) => ({
       date: order['Order Date'],
-      amount: order['Item Total'],
+      amount: order['Order Total'],
       payee: 'Amazon'
     }))
   );
@@ -175,5 +176,11 @@ test('gets test transactions', async () => {
 
 // test('correctly matches Amazon order details to Lunchmoney transactions', async () => {
 //   const testTransactions = await getTestTransactions();
-
+//   const groupedAmazonOrders = groupAmazonOrders(TestAmazonOrders);
+//   const matched: MatchedLunchmoneyTransaction[] = matchLunchmoneyToAmazon(testTransactions, groupedAmazonOrders);
+//   expect(matched).toEqual([
+//     {
+//       lmTransaction:
+//     }
+//   ])
 // });

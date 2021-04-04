@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import fetch, { RequestInit } from 'node-fetch';
 import { stringify } from 'query-string';
+import { groupAmazonOrders, GroupedAmazonOrder } from './script';
 import { TestAmazonOrders } from './test-utils';
 import { logger } from './util';
 
@@ -28,6 +29,11 @@ export interface LunchmoneyTransaction {
     id: number;
   }[];
   external_id: null;
+}
+
+export interface MatchedLunchmoneyTransaction {
+  lmTransaction: LunchmoneyTransaction;
+  amazonGroupedOrder: GroupedAmazonOrder;
 }
 
 export interface LunchmoneyCategory {
@@ -97,9 +103,10 @@ export async function insertTestAmazonTransactions(): Promise<
   LunchmoneyTransaction[]
 > {
   const testCategoryId = await getTestCategoryId();
-  const forInsertion = TestAmazonOrders.map((order) => ({
+  const groupedAmazonOrders = groupAmazonOrders(TestAmazonOrders);
+  const forInsertion = groupedAmazonOrders.map((order) => ({
     date: order['Order Date'],
-    amount: order['Item Total'],
+    amount: order['Order Total'],
     payee: 'Amazon',
     category_id: testCategoryId
   }));
@@ -155,3 +162,78 @@ export async function getTestCategoryId(): Promise<number> {
     ).category_id;
   }
 }
+
+const t = [
+  {
+    id: 28579633,
+    date: '2021-03-21',
+    payee: 'Amazon',
+    amount: '9.9900',
+    currency: 'usd',
+    notes: null,
+    category_id: 179172,
+    recurring_id: null,
+    asset_id: null,
+    plaid_account_id: null,
+    status: 'uncleared',
+    is_group: false,
+    group_id: null,
+    parent_id: null,
+    tags: null,
+    external_id: null
+  },
+  {
+    id: 28579634,
+    date: '2021-03-21',
+    payee: 'Amazon',
+    amount: '12.9900',
+    currency: 'usd',
+    notes: null,
+    category_id: 179172,
+    recurring_id: null,
+    asset_id: null,
+    plaid_account_id: null,
+    status: 'uncleared',
+    is_group: false,
+    group_id: null,
+    parent_id: null,
+    tags: null,
+    external_id: null
+  },
+  {
+    id: 28579635,
+    date: '2021-03-22',
+    payee: 'Amazon',
+    amount: '15.9900',
+    currency: 'usd',
+    notes: null,
+    category_id: 179172,
+    recurring_id: null,
+    asset_id: null,
+    plaid_account_id: null,
+    status: 'uncleared',
+    is_group: false,
+    group_id: null,
+    parent_id: null,
+    tags: null,
+    external_id: null
+  },
+  {
+    id: 28579636,
+    date: '2021-03-22',
+    payee: 'Amazon',
+    amount: '15.9900',
+    currency: 'usd',
+    notes: null,
+    category_id: 179172,
+    recurring_id: null,
+    asset_id: null,
+    plaid_account_id: null,
+    status: 'uncleared',
+    is_group: false,
+    group_id: null,
+    parent_id: null,
+    tags: null,
+    external_id: null
+  }
+];
