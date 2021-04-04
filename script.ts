@@ -1,6 +1,8 @@
 import csv from 'csv-parser';
 import { format, parse } from 'date-fns';
 import fs from 'fs';
+import { LunchmoneyTransaction, MatchedLunchmoneyTransaction } from './api';
+import { logger } from './util';
 
 export interface AmazonOrder {
   'Order Date': string;
@@ -142,6 +144,34 @@ export function groupAmazonOrders(orders: AmazonOrder[]): GroupedAmazonOrder[] {
     }
   }
   return groupedOrders;
+}
+
+export function matchLunchmoneyToAmazon(
+  lmTransactions: LunchmoneyTransaction[],
+  amazonOrders: AmazonOrder[]
+): MatchedLunchmoneyTransaction[] {
+  const groupedAmazonOrders = groupAmazonOrders(amazonOrders);
+  const matched: MatchedLunchmoneyTransaction[] = [];
+  for (let i = 0; i < groupedAmazonOrders.length; i++) {
+    const amazonGroupedOrder = groupedAmazonOrders[i];
+    const matchingLmTransaction = lmTransactions.find(
+      (d) =>
+        amazonGroupedOrder['Order Date'] === d.date &&
+        amazonGroupedOrder['Order Total'] === parseFloat(d.amount)
+    );
+    // Gracefully skip missing matches, but warn for manual intervention
+    if (!matchingLmTransaction) {
+      logger(
+        `Could not match Amazon order # ${amazonGroupedOrder['Order ID']} to a Lunchmoney transaction!`
+      );
+    } else {
+      matched.push({
+        lmTransaction: matchingLmTransaction,
+        amazonGroupedOrder
+      });
+    }
+  }
+  return matched;
 }
 
 export async function start() {
