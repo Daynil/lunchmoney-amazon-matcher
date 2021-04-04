@@ -22,6 +22,13 @@ export interface AmazonOrder {
   Currency: string;
 }
 
+export interface GroupedAmazonOrder {
+  'Order Date': string;
+  'Order ID': string;
+  'Order Total': number;
+  OrderItems: AmazonOrder[];
+}
+
 export function dateFormatter(
   dateString: string,
   toFormat: 'lunchmoney' | 'amazon'
@@ -107,6 +114,34 @@ export async function parseAmazonOrderCSV(
       })
       .on('error', (e) => reject(e));
   });
+}
+
+/**
+ * In order to match Amazon orders with multiple items, we need to group them together.
+ * Amazon returns one row per item, even if they were in the same transaction (order).
+ * However, on credit card statements, and thus Lunchmoney, each order is lumped into 1 transactions, regardless of item count.
+ * @param orders Original Amazon orders (1 row per item)
+ */
+export function groupAmazonOrders(orders: AmazonOrder[]): GroupedAmazonOrder[] {
+  const groupedOrders: GroupedAmazonOrder[] = [];
+  for (let i = 0; i < orders.length; i++) {
+    const order = orders[i];
+    const existingOrderGroup = groupedOrders.find(
+      (d) => d['Order ID'] === order['Order ID']
+    );
+    if (existingOrderGroup) {
+      existingOrderGroup.OrderItems.push(order);
+      existingOrderGroup['Order Total'] += order['Item Total'];
+    } else {
+      groupedOrders.push({
+        'Order Date': order['Order Date'],
+        'Order ID': order['Order ID'],
+        'Order Total': order['Item Total'],
+        OrderItems: [order]
+      });
+    }
+  }
+  return groupedOrders;
 }
 
 export async function start() {
