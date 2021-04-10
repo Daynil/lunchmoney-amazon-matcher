@@ -157,22 +157,29 @@ export function matchLunchmoneyToAmazon(
 ): MatchedLunchmoneyTransaction[] {
   const groupedAmazonOrders = groupAmazonOrders(amazonOrders);
   const matched: MatchedLunchmoneyTransaction[] = [];
-  for (let i = 0; i < groupedAmazonOrders.length; i++) {
-    const amazonGroupedOrder = groupedAmazonOrders[i];
-    const matchingLmTransaction = lmTransactions.find(
+  for (let i = 0; i < lmTransactions.length; i++) {
+    const lmTransaction = lmTransactions[i];
+    const matchingAmazonGroupedOrders = groupedAmazonOrders.filter(
       (d) =>
-        amazonGroupedOrder.Order_Date === d.date &&
-        amazonGroupedOrder.Order_Total === parseFloat(d.amount)
+        d.Order_Date === lmTransaction.date &&
+        d.Order_Total === parseFloat(lmTransaction.amount)
     );
     // Gracefully skip missing matches, but warn for manual intervention
-    if (!matchingLmTransaction) {
+    if (matchingAmazonGroupedOrders.length === 0) {
       logger(
-        `Could not match Amazon order # ${amazonGroupedOrder.Order_ID} to a Lunchmoney transaction!`
+        `Could not match Lunchmoney transaction: ${lmTransaction.date} $${lmTransaction.amount} to an Amazon Order! Skipping...`,
+        'warn'
+      );
+      // Gracefully skip multi-matched orders, requires manual disambiguation
+    } else if (matchingAmazonGroupedOrders.length > 1) {
+      logger(
+        `Lunchmoney transaction: ${lmTransaction.date} $${lmTransaction.amount} matched multiple Amazon Orders! Skipping...`,
+        'warn'
       );
     } else {
       matched.push({
-        lmTransaction: matchingLmTransaction,
-        amazonGroupedOrder
+        lmTransaction,
+        amazonGroupedOrder: matchingAmazonGroupedOrders[0]
       });
     }
   }
@@ -188,7 +195,7 @@ export function enrichLMOrdersWithAmazonOrderDetails(
     const { amazonGroupedOrder, lmTransaction } = matchedTransaction;
     return {
       ...lmTransaction,
-      notes: generateTransactionNote(amazonGroupedOrder)
+      notes: generateTransactionNote(amazonGroupedOrder.OrderItems)
     };
   });
 }

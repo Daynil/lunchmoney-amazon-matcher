@@ -1,3 +1,5 @@
+import chalk from 'chalk';
+import { LunchmoneyTransaction } from './api';
 import {
   AmazonOrder,
   dateFormatter,
@@ -286,25 +288,14 @@ test('gets test transactions', async () => {
   );
 });
 
-// TODO add test case for duplicate order date & amounts
-// we won't be able to parse those properly, add text indicating order IDs saying we can't disambiguate - requires manual intervention
-// Should be pretty rare...
 test('correctly matches Amazon order details to Lunchmoney transactions', async () => {
   const testTransactions = await getTestTransactions();
-  const matched = matchLunchmoneyToAmazon(testTransactions, TestAmazonOrders);
-  expect(
-    matched.map((match) => {
-      const { date, amount, payee } = match.lmTransaction;
-      return {
-        lmTransaction: {
-          date,
-          amount,
-          payee
-        },
-        amazonGroupedOrder: match.amazonGroupedOrder
-      };
-    })
-  ).toEqual([
+  const allMatched = matchLunchmoneyToAmazon(
+    testTransactions,
+    TestAmazonOrders
+  );
+
+  const expected = [
     {
       lmTransaction: {
         date: '2021-03-21',
@@ -427,7 +418,131 @@ test('correctly matches Amazon order details to Lunchmoney transactions', async 
         ]
       }
     }
+  ];
+
+  expect(
+    allMatched.map((match) => {
+      const { date, amount, payee } = match.lmTransaction;
+      return {
+        lmTransaction: {
+          date,
+          amount,
+          payee
+        },
+        amazonGroupedOrder: match.amazonGroupedOrder
+      };
+    })
+  ).toEqual(expected);
+
+  const resetConsole = { ...global.console };
+  global.console = {
+    ...global.console,
+    warn: jest.fn()
+  };
+
+  const withUnmatched = matchLunchmoneyToAmazon(
+    [
+      ...testTransactions,
+      {
+        date: '2021-04-22',
+        payee: 'Amazon',
+        amount: '99.9900'
+      } as LunchmoneyTransaction
+    ],
+    TestAmazonOrders
+  );
+
+  expect(
+    withUnmatched.map((match) => {
+      const { date, amount, payee } = match.lmTransaction;
+      return {
+        lmTransaction: {
+          date,
+          amount,
+          payee
+        },
+        amazonGroupedOrder: match.amazonGroupedOrder
+      };
+    })
+  ).toEqual(expected);
+
+  expect(global.console.warn).toHaveBeenCalledWith(
+    chalk.yellow(
+      'Could not match Lunchmoney transaction: 2021-04-22 $99.9900 to an Amazon Order! Skipping...'
+    )
+  );
+
+  const withDuplicate = matchLunchmoneyToAmazon(testTransactions, [
+    ...TestAmazonOrders,
+    {
+      Order_Date: '2021-03-22',
+      Order_ID: '123-9999001-0111099',
+      Title:
+        'This is a different item group but will group to same order date and total as 123-9999001-0111006 ($31.98) item 1',
+      Category: 'OBJECT1',
+      Condition: 'new',
+      Seller: 'Fammison',
+      Purchase_Price_Per_Unit: 4.25,
+      Quantity: 1,
+      Payment_Instrument_Type: 'Visa - 1234',
+      Purchase_Order_Number: '',
+      PO_Line_Number: '',
+      Ordering_Customer_Email: 'test@gmail.com',
+      Item_Subtotal: 4.25,
+      Item_Subtotal_Tax: 0,
+      Item_Total: 4.25,
+      Buyer_Name: 'Test Person',
+      Currency: 'USD'
+    },
+    {
+      Order_Date: '2021-03-22',
+      Order_ID: '123-9999001-0111099',
+      Title:
+        'This is a different item group but will group to same order date and total as 123-9999001-0111006 ($31.98) item 2',
+      Category: 'OBJECT2',
+      Condition: 'new',
+      Seller: 'Fammison',
+      Purchase_Price_Per_Unit: 27.73,
+      Quantity: 1,
+      Payment_Instrument_Type: 'Visa - 1234',
+      Purchase_Order_Number: '',
+      PO_Line_Number: '',
+      Ordering_Customer_Email: 'test@gmail.com',
+      Item_Subtotal: 27.73,
+      Item_Subtotal_Tax: 0,
+      Item_Total: 27.73,
+      Buyer_Name: 'Test Person',
+      Currency: 'USD'
+    }
   ]);
+
+  expect(
+    withDuplicate.map((match) => {
+      const { date, amount, payee } = match.lmTransaction;
+      return {
+        lmTransaction: {
+          date,
+          amount,
+          payee
+        },
+        amazonGroupedOrder: match.amazonGroupedOrder
+      };
+    })
+  ).toEqual(
+    expected.filter(
+      (m) =>
+        m.lmTransaction.amount !== '31.9800' &&
+        m.lmTransaction.date !== '2021-03-22'
+    )
+  );
+
+  expect(global.console.warn).toHaveBeenCalledWith(
+    chalk.yellow(
+      'Lunchmoney transaction: 2021-03-22 $31.9800 matched multiple Amazon Orders! Skipping...'
+    )
+  );
+
+  global.console = { ...resetConsole };
 });
 
 test('Lunchmoney transactions are matched to Amazon orders and notes are enriched with order details', async () => {
