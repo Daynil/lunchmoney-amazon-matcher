@@ -2,32 +2,32 @@ import csv from 'csv-parser';
 import { format, parse } from 'date-fns';
 import fs from 'fs';
 import { LunchmoneyTransaction, MatchedLunchmoneyTransaction } from './api';
-import { generateTransactionNote, logger } from './util';
+import { generateTransactionNote, logger, replaceAll } from './util';
 
 export interface AmazonOrder {
-  'Order Date': string;
-  'Order ID': string;
+  Order_Date: string;
+  Order_ID: string;
   Title: string;
   Category: string;
   Condition: string;
   Seller: string;
-  'Purchase Price Per Unit': number;
+  Purchase_Price_Per_Unit: number;
   Quantity: number;
-  'Payment Instrument Type': string;
-  'Purchase Order Number': string;
-  'PO Line Number': string;
-  'Ordering Customer Email': string;
-  'Item Subtotal': number;
-  'Item Subtotal Tax': number;
-  'Item Total': number;
-  'Buyer Name': string;
+  Payment_Instrument_Type: string;
+  Purchase_Order_Number: string;
+  PO_Line_Number: string;
+  Ordering_Customer_Email: string;
+  Item_Subtotal: number;
+  Item_Subtotal_Tax: number;
+  Item_Total: number;
+  Buyer_Name: string;
   Currency: string;
 }
 
 export interface GroupedAmazonOrder {
-  'Order Date': string;
-  'Order ID': string;
-  'Order Total': number;
+  Order_Date: string;
+  Order_ID: string;
+  Order_Total: number;
   OrderItems: AmazonOrder[];
 }
 
@@ -51,7 +51,11 @@ export function dateFormatter(
 function getExpectedHeaders(): Promise<string[]> {
   return new Promise((resolve, reject) => {
     fs.createReadStream('./test-csv/expected_headers.csv')
-      .pipe(csv())
+      .pipe(
+        csv({
+          mapHeaders: ({ header }) => replaceAll(header, ' ', '_')
+        })
+      )
       .on('headers', (headers) => resolve(headers))
       .on('error', (e) => reject(e));
   });
@@ -66,12 +70,13 @@ export async function parseAmazonOrderCSV(
     fs.createReadStream(csvPath)
       .pipe(
         csv({
-          mapHeaders: ({ header, index }) => {
-            if (!expectedHeaders.includes(header)) return null;
-            return header;
+          mapHeaders: ({ header }) => {
+            const uscoreHeader = replaceAll(header, ' ', '_');
+            if (!expectedHeaders.includes(uscoreHeader)) return null;
+            return uscoreHeader;
           },
           mapValues: ({ header, index, value }) => {
-            if (header === 'Order Date') {
+            if (header === 'Order_Date') {
               const parsed = new Date(value);
               if (isNaN(parsed.getTime()))
                 return reject(`Value ${value} cannot be parsed to date`);
@@ -79,10 +84,10 @@ export async function parseAmazonOrderCSV(
             }
             if (
               [
-                'Purchase Price Per Unit',
-                'Item Subtotal',
-                'Item Subtotal Tax',
-                'Item Total',
+                'Purchase_Price_Per_Unit',
+                'Item_Subtotal',
+                'Item_Subtotal_Tax',
+                'Item_Total',
                 'Quantity'
               ].includes(header)
             ) {
@@ -129,16 +134,16 @@ export function groupAmazonOrders(orders: AmazonOrder[]): GroupedAmazonOrder[] {
   for (let i = 0; i < orders.length; i++) {
     const order = orders[i];
     const existingOrderGroup = groupedOrders.find(
-      (d) => d['Order ID'] === order['Order ID']
+      (d) => d.Order_ID === order.Order_ID
     );
     if (existingOrderGroup) {
       existingOrderGroup.OrderItems.push(order);
-      existingOrderGroup['Order Total'] += order['Item Total'];
+      existingOrderGroup.Order_Total += order.Item_Total;
     } else {
       groupedOrders.push({
-        'Order Date': order['Order Date'],
-        'Order ID': order['Order ID'],
-        'Order Total': order['Item Total'],
+        Order_Date: order.Order_Date,
+        Order_ID: order.Order_ID,
+        Order_Total: order.Item_Total,
         OrderItems: [order]
       });
     }
@@ -156,13 +161,13 @@ export function matchLunchmoneyToAmazon(
     const amazonGroupedOrder = groupedAmazonOrders[i];
     const matchingLmTransaction = lmTransactions.find(
       (d) =>
-        amazonGroupedOrder['Order Date'] === d.date &&
-        amazonGroupedOrder['Order Total'] === parseFloat(d.amount)
+        amazonGroupedOrder.Order_Date === d.date &&
+        amazonGroupedOrder.Order_Total === parseFloat(d.amount)
     );
     // Gracefully skip missing matches, but warn for manual intervention
     if (!matchingLmTransaction) {
       logger(
-        `Could not match Amazon order # ${amazonGroupedOrder['Order ID']} to a Lunchmoney transaction!`
+        `Could not match Amazon order # ${amazonGroupedOrder.Order_ID} to a Lunchmoney transaction!`
       );
     } else {
       matched.push({
@@ -183,7 +188,7 @@ export function enrichLMOrdersWithAmazonOrderDetails(
     const { amazonGroupedOrder, lmTransaction } = matchedTransaction;
     return {
       ...lmTransaction,
-      notes: generateTransactionNote(amazonGroupedOrder, lmTransaction)
+      notes: generateTransactionNote(amazonGroupedOrder)
     };
   });
 }

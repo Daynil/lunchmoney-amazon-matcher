@@ -22,7 +22,7 @@ test('missing headers throws properly', async () => {
     await parseAmazonOrderCSV('./test-csv/test_file_missing_headers.csv');
   } catch (e) {
     expect(e).toMatch(
-      'Amazon orders CSV missing expected headers: Title,Item Subtotal'
+      'Amazon orders CSV missing expected headers: Title,Item_Subtotal'
     );
   }
 });
@@ -56,102 +56,102 @@ test('Amazon orders are grouped by Order ID with totals', () => {
   );
   expect(groupedOrders).toEqual([
     {
-      'Order Date': '2021-03-21',
-      'Order ID': '123-9999001-0111004',
-      'Order Total': 9.99,
+      Order_Date: '2021-03-21',
+      Order_ID: '123-9999001-0111004',
+      Order_Total: 9.99,
       OrderItems: [
         {
-          'Order Date': '2021-03-21',
-          'Order ID': '123-9999001-0111004',
+          Order_Date: '2021-03-21',
+          Order_ID: '123-9999001-0111004',
           Title:
             'Sayfine Vegetable Steamer Basket, Premium Stainless Steel Veggie Steamer Basket - Folding Expandable Steamers to Fits Various Size Pot (6" to 10.5")',
           Category: 'COOKWARE',
           Condition: 'new',
           Seller: 'SAYFINE',
-          'Purchase Price Per Unit': 9.99,
+          Purchase_Price_Per_Unit: 9.99,
           Quantity: 1,
-          'Payment Instrument Type': 'Visa - 1234',
-          'Purchase Order Number': '',
-          'PO Line Number': '',
-          'Ordering Customer Email': 'test@gmail.com',
-          'Item Subtotal': 9.99,
-          'Item Subtotal Tax': 0,
-          'Item Total': 9.99,
-          'Buyer Name': 'Test Person',
+          Payment_Instrument_Type: 'Visa - 1234',
+          Purchase_Order_Number: '',
+          PO_Line_Number: '',
+          Ordering_Customer_Email: 'test@gmail.com',
+          Item_Subtotal: 9.99,
+          Item_Subtotal_Tax: 0,
+          Item_Total: 9.99,
+          Buyer_Name: 'Test Person',
           Currency: 'USD'
         }
       ]
     },
     {
-      'Order Date': '2021-03-21',
-      'Order ID': '123-9999001-0111005',
-      'Order Total': 12.99,
+      Order_Date: '2021-03-21',
+      Order_ID: '123-9999001-0111005',
+      Order_Total: 12.99,
       OrderItems: [
         {
-          'Order Date': '2021-03-21',
-          'Order ID': '123-9999001-0111005',
+          Order_Date: '2021-03-21',
+          Order_ID: '123-9999001-0111005',
           Title:
             "Anthony's Organic Inulin Powder, 1 lb, Gluten Free, Non GMO, Made from Jerusalem Artichokes",
           Category: 'GROCERY',
           Condition: 'new',
           Seller: "Anthony's Goods",
-          'Purchase Price Per Unit': 12.99,
+          Purchase_Price_Per_Unit: 12.99,
           Quantity: 1,
-          'Payment Instrument Type': 'Visa - 1234',
-          'Purchase Order Number': '',
-          'PO Line Number': '',
-          'Ordering Customer Email': 'test@gmail.com',
-          'Item Subtotal': 12.99,
-          'Item Subtotal Tax': 0,
-          'Item Total': 12.99,
-          'Buyer Name': 'Test Person',
+          Payment_Instrument_Type: 'Visa - 1234',
+          Purchase_Order_Number: '',
+          PO_Line_Number: '',
+          Ordering_Customer_Email: 'test@gmail.com',
+          Item_Subtotal: 12.99,
+          Item_Subtotal_Tax: 0,
+          Item_Total: 12.99,
+          Buyer_Name: 'Test Person',
           Currency: 'USD'
         }
       ]
     },
     {
-      'Order Date': '2021-03-22',
-      'Order ID': '123-9999001-0111006',
-      'Order Total': 31.98,
+      Order_Date: '2021-03-22',
+      Order_ID: '123-9999001-0111006',
+      Order_Total: 31.98,
       OrderItems: [
         {
-          'Order Date': '2021-03-22',
-          'Order ID': '123-9999001-0111006',
+          Order_Date: '2021-03-22',
+          Order_ID: '123-9999001-0111006',
           Title:
             'FURTALK Sun Visor Hats for Women Wide Brim Straw Roll Up Ponytail Summer Beach Hat UV UPF 50 Packable Foldable Travel',
           Category: 'HAT',
           Condition: 'new',
           Seller: 'Fammison',
-          'Purchase Price Per Unit': 15.99,
+          Purchase_Price_Per_Unit: 15.99,
           Quantity: 1,
-          'Payment Instrument Type': 'Visa - 1234',
-          'Purchase Order Number': '',
-          'PO Line Number': '',
-          'Ordering Customer Email': 'test@gmail.com',
-          'Item Subtotal': 15.99,
-          'Item Subtotal Tax': 0,
-          'Item Total': 15.99,
-          'Buyer Name': 'Test Person',
+          Payment_Instrument_Type: 'Visa - 1234',
+          Purchase_Order_Number: '',
+          PO_Line_Number: '',
+          Ordering_Customer_Email: 'test@gmail.com',
+          Item_Subtotal: 15.99,
+          Item_Subtotal_Tax: 0,
+          Item_Total: 15.99,
+          Buyer_Name: 'Test Person',
           Currency: 'USD'
         },
         {
-          'Order Date': '2021-03-22',
-          'Order ID': '123-9999001-0111006',
+          Order_Date: '2021-03-22',
+          Order_ID: '123-9999001-0111006',
           Title:
             'FURTALK Sun Visor Hats for Women Wide Brim Straw Roll Up Ponytail Summer Beach Hat UV UPF 50 Packable Foldable Travel',
           Category: 'HAT',
           Condition: 'new',
           Seller: 'Fammison',
-          'Purchase Price Per Unit': 15.99,
+          Purchase_Price_Per_Unit: 15.99,
           Quantity: 1,
-          'Payment Instrument Type': 'Visa - 1234',
-          'Purchase Order Number': '',
-          'PO Line Number': '',
-          'Ordering Customer Email': 'test@gmail.com',
-          'Item Subtotal': 15.99,
-          'Item Subtotal Tax': 0,
-          'Item Total': 15.99,
-          'Buyer Name': 'Test Person',
+          Payment_Instrument_Type: 'Visa - 1234',
+          Purchase_Order_Number: '',
+          PO_Line_Number: '',
+          Ordering_Customer_Email: 'test@gmail.com',
+          Item_Subtotal: 15.99,
+          Item_Subtotal_Tax: 0,
+          Item_Total: 15.99,
+          Buyer_Name: 'Test Person',
           Currency: 'USD'
         }
       ]
@@ -170,8 +170,8 @@ test('gets test transactions', async () => {
     }))
   ).toEqual(
     groupedAmazonOrders.map((order) => ({
-      date: order['Order Date'],
-      amount: order['Order Total'],
+      date: order.Order_Date,
+      amount: order.Order_Total,
       payee: 'Amazon'
     }))
   );
@@ -203,28 +203,28 @@ test('correctly matches Amazon order details to Lunchmoney transactions', async 
         amount: '9.9900'
       },
       amazonGroupedOrder: {
-        'Order Date': '2021-03-21',
-        'Order ID': '123-9999001-0111004',
-        'Order Total': 9.99,
+        Order_Date: '2021-03-21',
+        Order_ID: '123-9999001-0111004',
+        Order_Total: 9.99,
         OrderItems: [
           {
-            'Order Date': '2021-03-21',
-            'Order ID': '123-9999001-0111004',
+            Order_Date: '2021-03-21',
+            Order_ID: '123-9999001-0111004',
             Title:
               'Sayfine Vegetable Steamer Basket, Premium Stainless Steel Veggie Steamer Basket - Folding Expandable Steamers to Fits Various Size Pot (6" to 10.5")',
             Category: 'COOKWARE',
             Condition: 'new',
             Seller: 'SAYFINE',
-            'Purchase Price Per Unit': 9.99,
+            Purchase_Price_Per_Unit: 9.99,
             Quantity: 1,
-            'Payment Instrument Type': 'Visa - 1234',
-            'Purchase Order Number': '',
-            'PO Line Number': '',
-            'Ordering Customer Email': 'test@gmail.com',
-            'Item Subtotal': 9.99,
-            'Item Subtotal Tax': 0,
-            'Item Total': 9.99,
-            'Buyer Name': 'Test Person',
+            Payment_Instrument_Type: 'Visa - 1234',
+            Purchase_Order_Number: '',
+            PO_Line_Number: '',
+            Ordering_Customer_Email: 'test@gmail.com',
+            Item_Subtotal: 9.99,
+            Item_Subtotal_Tax: 0,
+            Item_Total: 9.99,
+            Buyer_Name: 'Test Person',
             Currency: 'USD'
           }
         ]
@@ -237,28 +237,28 @@ test('correctly matches Amazon order details to Lunchmoney transactions', async 
         amount: '12.9900'
       },
       amazonGroupedOrder: {
-        'Order Date': '2021-03-21',
-        'Order ID': '123-9999001-0111005',
-        'Order Total': 12.99,
+        Order_Date: '2021-03-21',
+        Order_ID: '123-9999001-0111005',
+        Order_Total: 12.99,
         OrderItems: [
           {
-            'Order Date': '2021-03-21',
-            'Order ID': '123-9999001-0111005',
+            Order_Date: '2021-03-21',
+            Order_ID: '123-9999001-0111005',
             Title:
               "Anthony's Organic Inulin Powder, 1 lb, Gluten Free, Non GMO, Made from Jerusalem Artichokes",
             Category: 'GROCERY',
             Condition: 'new',
             Seller: "Anthony's Goods",
-            'Purchase Price Per Unit': 12.99,
+            Purchase_Price_Per_Unit: 12.99,
             Quantity: 1,
-            'Payment Instrument Type': 'Visa - 1234',
-            'Purchase Order Number': '',
-            'PO Line Number': '',
-            'Ordering Customer Email': 'test@gmail.com',
-            'Item Subtotal': 12.99,
-            'Item Subtotal Tax': 0,
-            'Item Total': 12.99,
-            'Buyer Name': 'Test Person',
+            Payment_Instrument_Type: 'Visa - 1234',
+            Purchase_Order_Number: '',
+            PO_Line_Number: '',
+            Ordering_Customer_Email: 'test@gmail.com',
+            Item_Subtotal: 12.99,
+            Item_Subtotal_Tax: 0,
+            Item_Total: 12.99,
+            Buyer_Name: 'Test Person',
             Currency: 'USD'
           }
         ]
@@ -271,48 +271,48 @@ test('correctly matches Amazon order details to Lunchmoney transactions', async 
         amount: '31.9800'
       },
       amazonGroupedOrder: {
-        'Order Date': '2021-03-22',
-        'Order ID': '123-9999001-0111006',
-        'Order Total': 31.98,
+        Order_Date: '2021-03-22',
+        Order_ID: '123-9999001-0111006',
+        Order_Total: 31.98,
         OrderItems: [
           {
-            'Order Date': '2021-03-22',
-            'Order ID': '123-9999001-0111006',
+            Order_Date: '2021-03-22',
+            Order_ID: '123-9999001-0111006',
             Title:
               'FURTALK Sun Visor Hats for Women Wide Brim Straw Roll Up Ponytail Summer Beach Hat UV UPF 50 Packable Foldable Travel',
             Category: 'HAT',
             Condition: 'new',
             Seller: 'Fammison',
-            'Purchase Price Per Unit': 15.99,
+            Purchase_Price_Per_Unit: 15.99,
             Quantity: 1,
-            'Payment Instrument Type': 'Visa - 1234',
-            'Purchase Order Number': '',
-            'PO Line Number': '',
-            'Ordering Customer Email': 'test@gmail.com',
-            'Item Subtotal': 15.99,
-            'Item Subtotal Tax': 0,
-            'Item Total': 15.99,
-            'Buyer Name': 'Test Person',
+            Payment_Instrument_Type: 'Visa - 1234',
+            Purchase_Order_Number: '',
+            PO_Line_Number: '',
+            Ordering_Customer_Email: 'test@gmail.com',
+            Item_Subtotal: 15.99,
+            Item_Subtotal_Tax: 0,
+            Item_Total: 15.99,
+            Buyer_Name: 'Test Person',
             Currency: 'USD'
           },
           {
-            'Order Date': '2021-03-22',
-            'Order ID': '123-9999001-0111006',
+            Order_Date: '2021-03-22',
+            Order_ID: '123-9999001-0111006',
             Title:
               'FURTALK Sun Visor Hats for Women Wide Brim Straw Roll Up Ponytail Summer Beach Hat UV UPF 50 Packable Foldable Travel',
             Category: 'HAT',
             Condition: 'new',
             Seller: 'Fammison',
-            'Purchase Price Per Unit': 15.99,
+            Purchase_Price_Per_Unit: 15.99,
             Quantity: 1,
-            'Payment Instrument Type': 'Visa - 1234',
-            'Purchase Order Number': '',
-            'PO Line Number': '',
-            'Ordering Customer Email': 'test@gmail.com',
-            'Item Subtotal': 15.99,
-            'Item Subtotal Tax': 0,
-            'Item Total': 15.99,
-            'Buyer Name': 'Test Person',
+            Payment_Instrument_Type: 'Visa - 1234',
+            Purchase_Order_Number: '',
+            PO_Line_Number: '',
+            Ordering_Customer_Email: 'test@gmail.com',
+            Item_Subtotal: 15.99,
+            Item_Subtotal_Tax: 0,
+            Item_Total: 15.99,
+            Buyer_Name: 'Test Person',
             Currency: 'USD'
           }
         ]
@@ -358,28 +358,28 @@ test('Lunchmoney transactions are matched to Amazon orders and notes are enriche
 
 test('Transaction notes are generated and truncated when needed', () => {
   let singleAmazonOrderNote: GroupedAmazonOrder = {
-    'Order Date': '2021-03-21',
-    'Order ID': '123-9999001-0111004',
-    'Order Total': 9.99,
+    Order_Date: '2021-03-21',
+    Order_ID: '123-9999001-0111004',
+    Order_Total: 9.99,
     OrderItems: [
       {
-        'Order Date': '2021-03-21',
-        'Order ID': '123-9999001-0111004',
+        Order_Date: '2021-03-21',
+        Order_ID: '123-9999001-0111004',
         Title:
           'Sayfine Vegetable Steamer Basket, Premium Stainless Steel Veggie Steamer Basket - Folding Expandable Steamers to Fits Various Size Pot (6" to 10.5")',
         Category: 'COOKWARE',
         Condition: 'new',
         Seller: 'SAYFINE',
-        'Purchase Price Per Unit': 9.99,
+        Purchase_Price_Per_Unit: 9.99,
         Quantity: 1,
-        'Payment Instrument Type': 'Visa - 1234',
-        'Purchase Order Number': '',
-        'PO Line Number': '',
-        'Ordering Customer Email': 'test@gmail.com',
-        'Item Subtotal': 9.99,
-        'Item Subtotal Tax': 0,
-        'Item Total': 9.99,
-        'Buyer Name': 'Test Person',
+        Payment_Instrument_Type: 'Visa - 1234',
+        Purchase_Order_Number: '',
+        PO_Line_Number: '',
+        Ordering_Customer_Email: 'test@gmail.com',
+        Item_Subtotal: 9.99,
+        Item_Subtotal_Tax: 0,
+        Item_Total: 9.99,
+        Buyer_Name: 'Test Person',
         Currency: 'USD'
       }
     ]

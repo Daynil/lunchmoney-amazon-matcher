@@ -115,8 +115,8 @@ export async function insertTestAmazonTransactions(): Promise<
   const testCategoryId = await getTestCategoryId();
   const groupedAmazonOrders = groupAmazonOrders(TestAmazonOrders);
   const forInsertion = groupedAmazonOrders.map((order) => ({
-    date: order['Order Date'],
-    amount: order['Order Total'],
+    date: order.Order_Date,
+    amount: order.Order_Total,
     payee: 'Amazon',
     category_id: testCategoryId
   }));

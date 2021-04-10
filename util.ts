@@ -2,6 +2,28 @@ import chalk from 'chalk';
 import { LM_API_MAX_NOTE_LENGTH } from './api';
 import { GroupedAmazonOrder } from './script';
 
+/**
+ * string.replaceAll polyfill for node
+ */
+export function replaceAll(
+  string: string,
+  searchValue: string,
+  replaceValue: string
+) {
+  return string.replace(
+    new RegExp(escapeRegExp(searchValue), 'g'),
+    replaceValue
+  );
+}
+
+/**
+ * When using regexp with string literals, escape special characters
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
+ */
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
 export function logger(
   message: string,
   level: 'info' | 'default' | 'warn' | 'error' = 'default'
@@ -45,7 +67,7 @@ export function generateTransactionNote(
     for (let i = 0; i < amazonGroupedOrder.OrderItems.length; i++) {
       const amazonItem = amazonGroupedOrder.OrderItems[i];
       orderNoteFixedString.push(
-        `Item ${i + 1}: $${amazonItem['Item Total']}: (${amazonItem.Category})`
+        `Item ${i + 1}: $${amazonItem.Item_Total}: (${amazonItem.Category})`
       );
       orderNoteDetails.push(amazonItem.Title);
     }
