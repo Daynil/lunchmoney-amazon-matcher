@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { LM_API_MAX_NOTE_LENGTH } from './api';
-import { GroupedAmazonOrder } from './script';
+import { AmazonOrder } from './script';
 
 /**
  * string.replaceAll polyfill for node
@@ -47,11 +47,11 @@ export function logger(
 }
 
 export function generateTransactionNote(
-  amazonGroupedOrder: GroupedAmazonOrder
+  amazonOrderItems: AmazonOrder[]
 ): string {
   let noteForTransaction = '';
-  if (amazonGroupedOrder.OrderItems.length === 1) {
-    const amazonItem = amazonGroupedOrder.OrderItems[0];
+  if (amazonOrderItems.length === 1) {
+    const amazonItem = amazonOrderItems[0];
     noteForTransaction = `(${amazonItem.Category}) ${amazonItem.Title}`;
     if (noteForTransaction.length > LM_API_MAX_NOTE_LENGTH) {
       noteForTransaction =
@@ -59,20 +59,31 @@ export function generateTransactionNote(
     }
     return noteForTransaction;
   } else {
-    // Minimal note contents - we won't try shortening these
+    // Minimal note contents needed for context - we won't try shortening these
     const orderNoteFixedString: string[] = [];
     // Index-matched order details, shorten when needed
-    const orderNoteDetails: string[] = [];
+    let orderNoteDetails: string[] = [];
     // Phase one - try using full titles
-    for (let i = 0; i < amazonGroupedOrder.OrderItems.length; i++) {
-      const amazonItem = amazonGroupedOrder.OrderItems[i];
+    for (let i = 0; i < amazonOrderItems.length; i++) {
+      const amazonItem = amazonOrderItems[i];
       orderNoteFixedString.push(
         `Item ${i + 1}: $${amazonItem.Item_Total}: (${amazonItem.Category})`
       );
       orderNoteDetails.push(amazonItem.Title);
     }
-    // Phase two - if our minimum note is still too long, truncate orders at max
-    if (orderNoteFixedString.join('; ').length > LM_API_MAX_NOTE_LENGTH) {
+
+    noteForTransaction = joinNoteFixedAndDetails(
+      orderNoteFixedString,
+      orderNoteDetails
+    );
+    if (noteForTransaction.length <= LM_API_MAX_NOTE_LENGTH)
+      return noteForTransaction;
+
+    // Phase two - if our minimum contextual note is still too long, truncate fixed only at max
+    const minMeaningfulTruncatedDescriptorLength =
+      orderNoteFixedString.join('; ').length +
+      orderNoteFixedString.length * 'Descript...'.length;
+    if (minMeaningfulTruncatedDescriptorLength > LM_API_MAX_NOTE_LENGTH) {
       noteForTransaction = orderNoteFixedString.join('; ');
       const ordersTruncatedMsg = ' (ADDT’L ORDERS TRUNCATED)...';
       return (
@@ -82,11 +93,62 @@ export function generateTransactionNote(
         ) + ordersTruncatedMsg
       );
     }
-    // TODO: Where shall we go from here?
-    // Phase three - shorten the longest title to the length of the second-longest
-    if (orderNoteFixedString.join().length > LM_API_MAX_NOTE_LENGTH) {
-    }
-  }
 
-  return noteForTransaction;
+    /*
+      Phase 3
+      Preserve maximum context by shortening longest descriptions first to 
+        the length of the next longest.
+      After all are equal length, shorten each by 1 char to spec.
+    */
+    do {
+      const orderNoteDetailsByLength: {
+        noteDetails: string;
+        origIdx: number;
+      }[] = orderNoteDetails
+        .map((note, i) => ({
+          noteDetails: note,
+          origIdx: i
+        }))
+        .sort((a, b) => a.noteDetails.length - b.noteDetails.length);
+      const longestNote =
+        orderNoteDetailsByLength[orderNoteDetailsByLength.length - 1];
+      let nextLongestNote = '';
+      for (let i = orderNoteDetailsByLength.length - 2; i >= 0; i--) {
+        const nextLongest = orderNoteDetailsByLength[i].noteDetails;
+        if (nextLongest.length < longestNote.noteDetails.length) {
+          nextLongestNote = nextLongest;
+          break;
+        }
+      }
+
+      if (nextLongestNote !== '') {
+        orderNoteDetails[longestNote.origIdx] =
+          orderNoteDetails[longestNote.origIdx].substring(
+            0,
+            nextLongestNote.length - 3
+          ) + '...';
+      } else {
+        // If we haven't found a next longest note, all notes are now equal length
+        // Strip 1 additional letter at a time
+        orderNoteDetails = orderNoteDetails.map((note) => {
+          if (note.substring(note.length - 3, note.length) === '...') {
+            return note.substring(0, note.length - 4) + '...';
+          } else return note.substring(0, note.length - 1) + '...';
+        });
+      }
+      noteForTransaction = joinNoteFixedAndDetails(
+        orderNoteFixedString,
+        orderNoteDetails
+      );
+    } while (noteForTransaction.length > LM_API_MAX_NOTE_LENGTH);
+
+    return noteForTransaction;
+  }
+}
+
+function joinNoteFixedAndDetails(
+  noteFixed: string[],
+  noteDetails: string[]
+): string {
+  return noteFixed.map((note, i) => `${note}: ${noteDetails[i]}`).join('; ');
 }
