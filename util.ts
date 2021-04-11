@@ -24,8 +24,12 @@ function escapeRegExp(string: string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
+function isErrorObj(error: Error | any): error is Error {
+  return (error as Error).stack !== undefined;
+}
+
 export function logger(
-  message: string,
+  message: any,
   level: 'info' | 'default' | 'warn' | 'error' = 'default'
 ) {
   switch (level) {
@@ -39,7 +43,11 @@ export function logger(
       console.warn(chalk.yellow(message));
       break;
     case 'error':
-      console.error(chalk.red(message));
+      if (isErrorObj(message)) {
+        console.error(chalk.red(message.stack));
+      } else {
+        console.error(chalk.red(message));
+      }
       break;
     default:
       break;

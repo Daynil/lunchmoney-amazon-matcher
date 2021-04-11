@@ -16,6 +16,9 @@ import {
 } from './test-utils';
 import { generateTransactionNote } from './util';
 
+/**
+ * Unit tests
+ */
 test('manages formatted dates', () => {
   const fromAmazon = '03/05/2021';
   const fromLunchmoney = '2021-03-05';
@@ -191,7 +194,9 @@ test('Transaction notes are generated and truncated when needed', () => {
   );
 });
 
-// Integration tests start here
+/**
+ * Integration tests
+ */
 test('gets test transactions', async () => {
   const testTransactions = await getTestTransactions();
   const groupedAmazonOrders = groupAmazonOrders(TestAmazonOrders);
@@ -369,11 +374,13 @@ test('correctly matches Amazon order details to Lunchmoney transactions', async 
   global.console = { ...resetConsole };
 });
 
-// TODO: Finish this E2E test
+/**
+ * Full E2E test
+ */
 test('Lunchmoney transactions are matched to Amazon orders and notes are enriched with order details', async () => {
-  const testTransactions = await getTestTransactions();
+  const testLMTransactions = await getTestTransactions();
   await enrichLMOrdersWithAmazonOrderDetails(
-    testTransactions,
+    testLMTransactions,
     TestAmazonOrders
   );
   const enrichedLMTransactions = await getTestTransactions(true);

@@ -48,6 +48,16 @@ export interface LunchmoneyCategory {
   group_id: number;
 }
 
+export type LunchmoneyAPIError = {
+  error: string | string[];
+};
+
+function isErrorRes<T>(
+  parsedRes: T | LunchmoneyAPIError
+): parsedRes is LunchmoneyAPIError {
+  return (parsedRes as LunchmoneyAPIError).error !== undefined;
+}
+
 type Opts = {
   param?: any;
   queryParams?: any;
@@ -78,10 +88,20 @@ export async function client<T>(
   }
 
   const response = await fetch(url, config);
-  if (response.ok) return (await response.json()) as T;
-  else {
+  if (response.ok) {
+    const parsedRes: T | LunchmoneyAPIError = await response.json();
+    if (isErrorRes(parsedRes)) {
+      const err =
+        typeof parsedRes.error === 'string'
+          ? parsedRes.error
+          : parsedRes.error.join('; ');
+      throw new Error(err);
+    } else {
+      return parsedRes;
+    }
+  } else {
     const errorMessage = await response.text();
-    return Promise.reject(new Error(errorMessage));
+    throw new Error(errorMessage);
   }
 }
 
@@ -99,19 +119,18 @@ export async function getLMAmazonTransactions(): Promise<
 export async function getLMTransaction(
   id: number
 ): Promise<LunchmoneyTransaction> {
-  return await client<LunchmoneyTransaction>('transaction', 'GET', {
+  return await client<LunchmoneyTransaction>('transactions', 'GET', {
     param: id
   });
 }
 
-export async function updateLMTransaction(
-  transaction: LunchmoneyTransaction
-): Promise<LunchmoneyTransaction> {
+export async function updateLMTransaction(transaction: LunchmoneyTransaction) {
   await client<{ updated: boolean }>('transactions', 'PUT', {
     param: transaction.id,
     body: {
-      transaction
+      transaction: {
+        notes: transaction.notes
+      }
     }
   });
-  return await getLMTransaction(transaction.id);
 }

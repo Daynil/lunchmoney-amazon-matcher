@@ -203,15 +203,20 @@ export async function enrichLMOrdersWithAmazonOrderDetails(
     };
   });
   for await (const lmTransaction of enrichedLMTransactions) {
-    await updateLMTransaction(lmTransaction);
+    try {
+      await updateLMTransaction(lmTransaction);
+    } catch (error) {
+      logger(error, 'error');
+    }
   }
 }
 
 export async function start() {
-  const parsed = await parseAmazonOrderCSV(
-    // './order-csv/01-Jan-2021_to_27-Mar-2021.csv'
-    './test-csv/test_orders.csv'
-  );
-  // console.log(parsed[parsed.length - 1]);
-  console.log(parsed);
+  // const parsed = await parseAmazonOrderCSV(
+  //   // './order-csv/01-Jan-2021_to_27-Mar-2021.csv'
+  //   './test-csv/test_orders.csv'
+  // );
+  // // console.log(parsed[parsed.length - 1]);
+  // console.log(parsed);
+  // await resetTestTransactions();
 }

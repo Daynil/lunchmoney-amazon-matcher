@@ -97,7 +97,13 @@ export const TestAmazonOrders: AmazonOrder[] = [
 export async function insertTestAmazonTransactions(): Promise<
   LunchmoneyTransaction[]
 > {
-  const testCategoryId = await getTestCategoryId();
+  let testCategoryId;
+  try {
+    testCategoryId = await getTestCategoryId();
+  } catch (error) {
+    logger(error, 'error');
+  }
+
   const groupedAmazonOrders = groupAmazonOrders(TestAmazonOrders);
   const forInsertion = groupedAmazonOrders.map((order) => ({
     date: order.Order_Date,
@@ -114,7 +120,12 @@ export async function insertTestAmazonTransactions(): Promise<
   } catch (e) {
     logger(e, 'error');
   }
-  return await getAllTestTransactions(testCategoryId);
+
+  try {
+    return await getAllTestTransactions(testCategoryId);
+  } catch (error) {
+    logger(error, 'error');
+  }
 }
 
 export async function getAllTestTransactions(
@@ -182,9 +193,13 @@ export async function getTestTransactions(
     if (!forceLiveRefresh) {
       logger('Test transactions loaded from cache.', 'info');
     } else {
-      testTransactions = await getAllTestTransactions(
-        testTransactions[0].category_id
-      );
+      try {
+        testTransactions = await getAllTestTransactions(
+          testTransactions[0].category_id
+        );
+      } catch (error) {
+        logger(error, 'error');
+      }
       logger('Test transactions loaded from Lunchmoney.', 'info');
     }
   } else {
@@ -201,13 +216,24 @@ export async function getTestTransactions(
 /**
  * After E2E test, Amazon test transactions have notes added
  * Remove these for future test runs
+ *
+ * NOTE:
+ *  For a full test reset (for development purposes only) also:
+ *    1. Delete all test transactions manually in Lunchmoney
+ *    2. Delete LunchmoneyAmazonMatcherTest category
+ *    3. Delete JSON cache of test transactions
+ *    4. Rerun full test suite
  */
 export async function resetTestTransactions() {
   const testTransactions = await getTestTransactions();
   for await (const testTransaction of testTransactions) {
-    await updateLMTransaction({
-      ...testTransaction,
-      notes: ''
-    });
+    try {
+      await updateLMTransaction({
+        ...testTransaction,
+        notes: ''
+      });
+    } catch (error) {
+      logger(error, 'error');
+    }
   }
 }
