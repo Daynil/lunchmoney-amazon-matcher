@@ -9,7 +9,11 @@ import {
   matchLunchmoneyToAmazon,
   parseAmazonOrderCSV
 } from './script';
-import { getTestTransactions, TestAmazonOrders } from './test-utils';
+import {
+  getTestTransactions,
+  resetTestTransactions,
+  TestAmazonOrders
+} from './test-utils';
 import { generateTransactionNote } from './util';
 
 test('manages formatted dates', () => {
@@ -61,103 +65,21 @@ test('Amazon orders are grouped by Order ID with totals', () => {
     {
       Order_Date: '2021-03-21',
       Order_ID: '123-9999001-0111004',
-      Order_Total: 9.99,
-      OrderItems: [
-        {
-          Order_Date: '2021-03-21',
-          Order_ID: '123-9999001-0111004',
-          Title:
-            'Sayfine Vegetable Steamer Basket, Premium Stainless Steel Veggie Steamer Basket - Folding Expandable Steamers to Fits Various Size Pot (6" to 10.5")',
-          Category: 'COOKWARE',
-          Condition: 'new',
-          Seller: 'SAYFINE',
-          Purchase_Price_Per_Unit: 9.99,
-          Quantity: 1,
-          Payment_Instrument_Type: 'Visa - 1234',
-          Purchase_Order_Number: '',
-          PO_Line_Number: '',
-          Ordering_Customer_Email: 'test@gmail.com',
-          Item_Subtotal: 9.99,
-          Item_Subtotal_Tax: 0,
-          Item_Total: 9.99,
-          Buyer_Name: 'Test Person',
-          Currency: 'USD'
-        }
-      ]
+      Order_Total: TestAmazonOrders[0].Item_Total,
+      OrderItems: [TestAmazonOrders[0]]
     },
     {
       Order_Date: '2021-03-21',
       Order_ID: '123-9999001-0111005',
-      Order_Total: 12.99,
-      OrderItems: [
-        {
-          Order_Date: '2021-03-21',
-          Order_ID: '123-9999001-0111005',
-          Title:
-            "Anthony's Organic Inulin Powder, 1 lb, Gluten Free, Non GMO, Made from Jerusalem Artichokes",
-          Category: 'GROCERY',
-          Condition: 'new',
-          Seller: "Anthony's Goods",
-          Purchase_Price_Per_Unit: 12.99,
-          Quantity: 1,
-          Payment_Instrument_Type: 'Visa - 1234',
-          Purchase_Order_Number: '',
-          PO_Line_Number: '',
-          Ordering_Customer_Email: 'test@gmail.com',
-          Item_Subtotal: 12.99,
-          Item_Subtotal_Tax: 0,
-          Item_Total: 12.99,
-          Buyer_Name: 'Test Person',
-          Currency: 'USD'
-        }
-      ]
+      Order_Total: TestAmazonOrders[1].Item_Total,
+      OrderItems: [TestAmazonOrders[1]]
     },
     {
       Order_Date: '2021-03-22',
       Order_ID: '123-9999001-0111006',
-      Order_Total: 31.98,
-      OrderItems: [
-        {
-          Order_Date: '2021-03-22',
-          Order_ID: '123-9999001-0111006',
-          Title:
-            'FURTALK Sun Visor Hats for Women Wide Brim Straw Roll Up Ponytail Summer Beach Hat UV UPF 50 Packable Foldable Travel',
-          Category: 'HAT',
-          Condition: 'new',
-          Seller: 'Fammison',
-          Purchase_Price_Per_Unit: 15.99,
-          Quantity: 1,
-          Payment_Instrument_Type: 'Visa - 1234',
-          Purchase_Order_Number: '',
-          PO_Line_Number: '',
-          Ordering_Customer_Email: 'test@gmail.com',
-          Item_Subtotal: 15.99,
-          Item_Subtotal_Tax: 0,
-          Item_Total: 15.99,
-          Buyer_Name: 'Test Person',
-          Currency: 'USD'
-        },
-        {
-          Order_Date: '2021-03-22',
-          Order_ID: '123-9999001-0111006',
-          Title:
-            'FURTALK Sun Visor Hats for Women Wide Brim Straw Roll Up Ponytail Summer Beach Hat UV UPF 50 Packable Foldable Travel',
-          Category: 'HAT',
-          Condition: 'new',
-          Seller: 'Fammison',
-          Purchase_Price_Per_Unit: 15.99,
-          Quantity: 1,
-          Payment_Instrument_Type: 'Visa - 1234',
-          Purchase_Order_Number: '',
-          PO_Line_Number: '',
-          Ordering_Customer_Email: 'test@gmail.com',
-          Item_Subtotal: 15.99,
-          Item_Subtotal_Tax: 0,
-          Item_Total: 15.99,
-          Buyer_Name: 'Test Person',
-          Currency: 'USD'
-        }
-      ]
+      Order_Total:
+        TestAmazonOrders[2].Item_Total + TestAmazonOrders[3].Item_Total,
+      OrderItems: [TestAmazonOrders[2], TestAmazonOrders[3]]
     }
   ]);
 });
@@ -305,29 +227,8 @@ test('correctly matches Amazon order details to Lunchmoney transactions', async 
       amazonGroupedOrder: {
         Order_Date: '2021-03-21',
         Order_ID: '123-9999001-0111004',
-        Order_Total: 9.99,
-        OrderItems: [
-          {
-            Order_Date: '2021-03-21',
-            Order_ID: '123-9999001-0111004',
-            Title:
-              'Sayfine Vegetable Steamer Basket, Premium Stainless Steel Veggie Steamer Basket - Folding Expandable Steamers to Fits Various Size Pot (6" to 10.5")',
-            Category: 'COOKWARE',
-            Condition: 'new',
-            Seller: 'SAYFINE',
-            Purchase_Price_Per_Unit: 9.99,
-            Quantity: 1,
-            Payment_Instrument_Type: 'Visa - 1234',
-            Purchase_Order_Number: '',
-            PO_Line_Number: '',
-            Ordering_Customer_Email: 'test@gmail.com',
-            Item_Subtotal: 9.99,
-            Item_Subtotal_Tax: 0,
-            Item_Total: 9.99,
-            Buyer_Name: 'Test Person',
-            Currency: 'USD'
-          }
-        ]
+        Order_Total: TestAmazonOrders[0].Item_Total,
+        OrderItems: [TestAmazonOrders[0]]
       }
     },
     {
@@ -339,29 +240,8 @@ test('correctly matches Amazon order details to Lunchmoney transactions', async 
       amazonGroupedOrder: {
         Order_Date: '2021-03-21',
         Order_ID: '123-9999001-0111005',
-        Order_Total: 12.99,
-        OrderItems: [
-          {
-            Order_Date: '2021-03-21',
-            Order_ID: '123-9999001-0111005',
-            Title:
-              "Anthony's Organic Inulin Powder, 1 lb, Gluten Free, Non GMO, Made from Jerusalem Artichokes",
-            Category: 'GROCERY',
-            Condition: 'new',
-            Seller: "Anthony's Goods",
-            Purchase_Price_Per_Unit: 12.99,
-            Quantity: 1,
-            Payment_Instrument_Type: 'Visa - 1234',
-            Purchase_Order_Number: '',
-            PO_Line_Number: '',
-            Ordering_Customer_Email: 'test@gmail.com',
-            Item_Subtotal: 12.99,
-            Item_Subtotal_Tax: 0,
-            Item_Total: 12.99,
-            Buyer_Name: 'Test Person',
-            Currency: 'USD'
-          }
-        ]
+        Order_Total: TestAmazonOrders[1].Item_Total,
+        OrderItems: [TestAmazonOrders[1]]
       }
     },
     {
@@ -373,49 +253,9 @@ test('correctly matches Amazon order details to Lunchmoney transactions', async 
       amazonGroupedOrder: {
         Order_Date: '2021-03-22',
         Order_ID: '123-9999001-0111006',
-        Order_Total: 31.98,
-        OrderItems: [
-          {
-            Order_Date: '2021-03-22',
-            Order_ID: '123-9999001-0111006',
-            Title:
-              'FURTALK Sun Visor Hats for Women Wide Brim Straw Roll Up Ponytail Summer Beach Hat UV UPF 50 Packable Foldable Travel',
-            Category: 'HAT',
-            Condition: 'new',
-            Seller: 'Fammison',
-            Purchase_Price_Per_Unit: 15.99,
-            Quantity: 1,
-            Payment_Instrument_Type: 'Visa - 1234',
-            Purchase_Order_Number: '',
-            PO_Line_Number: '',
-            Ordering_Customer_Email: 'test@gmail.com',
-            Item_Subtotal: 15.99,
-            Item_Subtotal_Tax: 0,
-            Item_Total: 15.99,
-            Buyer_Name: 'Test Person',
-            Currency: 'USD'
-          },
-          {
-            Order_Date: '2021-03-22',
-            Order_ID: '123-9999001-0111006',
-            Title:
-              'FURTALK Sun Visor Hats for Women Wide Brim Straw Roll Up Ponytail Summer Beach Hat UV UPF 50 Packable Foldable Travel',
-            Category: 'HAT',
-            Condition: 'new',
-            Seller: 'Fammison',
-            Purchase_Price_Per_Unit: 15.99,
-            Quantity: 1,
-            Payment_Instrument_Type: 'Visa - 1234',
-            Purchase_Order_Number: '',
-            PO_Line_Number: '',
-            Ordering_Customer_Email: 'test@gmail.com',
-            Item_Subtotal: 15.99,
-            Item_Subtotal_Tax: 0,
-            Item_Total: 15.99,
-            Buyer_Name: 'Test Person',
-            Currency: 'USD'
-          }
-        ]
+        Order_Total:
+          TestAmazonOrders[2].Item_Total + TestAmazonOrders[3].Item_Total,
+        OrderItems: [TestAmazonOrders[2], TestAmazonOrders[3]]
       }
     }
   ];
@@ -475,44 +315,28 @@ test('correctly matches Amazon order details to Lunchmoney transactions', async 
   const withDuplicate = matchLunchmoneyToAmazon(testTransactions, [
     ...TestAmazonOrders,
     {
+      ...TestAmazonOrders[0],
       Order_Date: '2021-03-22',
       Order_ID: '123-9999001-0111099',
       Title:
         'This is a different item group but will group to same order date and total as 123-9999001-0111006 ($31.98) item 1',
       Category: 'OBJECT1',
-      Condition: 'new',
-      Seller: 'Fammison',
       Purchase_Price_Per_Unit: 4.25,
-      Quantity: 1,
-      Payment_Instrument_Type: 'Visa - 1234',
-      Purchase_Order_Number: '',
-      PO_Line_Number: '',
-      Ordering_Customer_Email: 'test@gmail.com',
       Item_Subtotal: 4.25,
       Item_Subtotal_Tax: 0,
-      Item_Total: 4.25,
-      Buyer_Name: 'Test Person',
-      Currency: 'USD'
+      Item_Total: 4.25
     },
     {
+      ...TestAmazonOrders[0],
       Order_Date: '2021-03-22',
       Order_ID: '123-9999001-0111099',
       Title:
         'This is a different item group but will group to same order date and total as 123-9999001-0111006 ($31.98) item 2',
       Category: 'OBJECT2',
-      Condition: 'new',
-      Seller: 'Fammison',
       Purchase_Price_Per_Unit: 27.73,
-      Quantity: 1,
-      Payment_Instrument_Type: 'Visa - 1234',
-      Purchase_Order_Number: '',
-      PO_Line_Number: '',
-      Ordering_Customer_Email: 'test@gmail.com',
       Item_Subtotal: 27.73,
       Item_Subtotal_Tax: 0,
-      Item_Total: 27.73,
-      Buyer_Name: 'Test Person',
-      Currency: 'USD'
+      Item_Total: 27.73
     }
   ]);
 
@@ -545,12 +369,15 @@ test('correctly matches Amazon order details to Lunchmoney transactions', async 
   global.console = { ...resetConsole };
 });
 
+// TODO: Finish this E2E test
 test('Lunchmoney transactions are matched to Amazon orders and notes are enriched with order details', async () => {
   const testTransactions = await getTestTransactions();
-  const enrichedLMTransactions = enrichLMOrdersWithAmazonOrderDetails(
+  await enrichLMOrdersWithAmazonOrderDetails(
     testTransactions,
     TestAmazonOrders
   );
+  const enrichedLMTransactions = await getTestTransactions(true);
+
   expect(
     enrichedLMTransactions.map(({ date, payee, amount, notes }) => ({
       date,
@@ -563,19 +390,22 @@ test('Lunchmoney transactions are matched to Amazon orders and notes are enriche
       date: '2021-03-21',
       payee: 'Amazon',
       amount: '9.9900',
-      notes: ''
+      notes:
+        '(COOKWARE) Sayfine Vegetable Steamer Basket, Premium Stainless Steel Veggie Steamer Basket - Folding Expandable Steamers to Fits Various Size Pot (6" to 10.5")'
     },
     {
       date: '2021-03-21',
       payee: 'Amazon',
       amount: '12.9900',
-      notes: ''
+      notes: `(GROCERY) Anthony's Organic Inulin Powder, 1 lb, Gluten Free, Non GMO, Made from Jerusalem Artichokes`
     },
     {
       date: '2021-03-22',
       payee: 'Amazon',
       amount: '31.9800',
-      notes: ''
+      notes: `Item 1: $15.99: (HAT): FURTALK Sun Visor Hats for Women Wide Brim Straw Roll Up Ponytail Summer Beach Hat UV UPF 50 Packable Foldable Travel; Item 2: $15.99: (HAT): FURTALK Sun Visor Hats for Women Wide Brim Straw Roll Up Ponytail Summer Beach Hat UV UPF 50 Packable Foldable Travel`
     }
   ]);
+
+  await resetTestTransactions();
 });

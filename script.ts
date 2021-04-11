@@ -1,7 +1,11 @@
 import csv from 'csv-parser';
 import { format, parse } from 'date-fns';
 import fs from 'fs';
-import { LunchmoneyTransaction, MatchedLunchmoneyTransaction } from './api';
+import {
+  LunchmoneyTransaction,
+  MatchedLunchmoneyTransaction,
+  updateLMTransaction
+} from './api';
 import { generateTransactionNote, logger, replaceAll } from './util';
 
 export interface AmazonOrder {
@@ -186,18 +190,21 @@ export function matchLunchmoneyToAmazon(
   return matched;
 }
 
-export function enrichLMOrdersWithAmazonOrderDetails(
+export async function enrichLMOrdersWithAmazonOrderDetails(
   lmTransactions: LunchmoneyTransaction[],
   amazonOrders: AmazonOrder[]
-): LunchmoneyTransaction[] {
+) {
   const matched = matchLunchmoneyToAmazon(lmTransactions, amazonOrders);
-  return matched.map((matchedTransaction) => {
+  const enrichedLMTransactions = matched.map((matchedTransaction) => {
     const { amazonGroupedOrder, lmTransaction } = matchedTransaction;
     return {
       ...lmTransaction,
       notes: generateTransactionNote(amazonGroupedOrder.OrderItems)
     };
   });
+  for await (const lmTransaction of enrichedLMTransactions) {
+    await updateLMTransaction(lmTransaction);
+  }
 }
 
 export async function start() {

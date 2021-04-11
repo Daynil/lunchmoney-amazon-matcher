@@ -1,9 +1,7 @@
 import * as dotenv from 'dotenv';
 import fetch, { RequestInit } from 'node-fetch';
 import { stringify } from 'query-string';
-import { groupAmazonOrders, GroupedAmazonOrder } from './script';
-import { TestAmazonOrders } from './test-utils';
-import { logger } from './util';
+import { GroupedAmazonOrder } from './script';
 
 const baseUrl = 'https://dev.lunchmoney.app/v1';
 export const LM_API_MAX_NOTE_LENGTH = 350;
@@ -56,7 +54,7 @@ type Opts = {
   body?: any;
 };
 
-async function client<T>(
+export async function client<T>(
   endpoint: string,
   method: 'GET' | 'PUT' | 'POST',
   options?: Opts
@@ -104,73 +102,6 @@ export async function getLMTransaction(
   return await client<LunchmoneyTransaction>('transaction', 'GET', {
     param: id
   });
-}
-
-/**
- * Create some transactions excluded from totals/budget for testing
- */
-export async function insertTestAmazonTransactions(): Promise<
-  LunchmoneyTransaction[]
-> {
-  const testCategoryId = await getTestCategoryId();
-  const groupedAmazonOrders = groupAmazonOrders(TestAmazonOrders);
-  const forInsertion = groupedAmazonOrders.map((order) => ({
-    date: order.Order_Date,
-    amount: order.Order_Total,
-    payee: 'Amazon',
-    category_id: testCategoryId
-  }));
-  try {
-    await client<{ ids: number[] }>('transactions', 'POST', {
-      body: {
-        transactions: forInsertion
-      }
-    });
-  } catch (e) {
-    logger(e, 'error');
-  }
-  return (
-    await client<{ transactions: LunchmoneyTransaction[] }>(
-      'transactions',
-      'GET',
-      {
-        queryParams: {
-          category_id: testCategoryId,
-          // Test transactions fall on these two dates
-          start_date: '2021-03-21',
-          end_date: '2021-03-22'
-        }
-      }
-    )
-  ).transactions;
-}
-
-/**
- * Test category makes for easier and more efficient retrieval
- * Also allows easy manual user deletion in interface if needed
- * Check if our test category exists, else create it
- */
-export async function getTestCategoryId(): Promise<number> {
-  const testCategoryName = 'LunchmoneyAmazonMatcherTest';
-  const allCategories = (
-    await client<{ categories: LunchmoneyCategory[] }>('categories', 'GET')
-  ).categories;
-  const testCategory = allCategories.find(
-    (category) => category.name === testCategoryName
-  );
-  if (testCategory) return testCategory.id;
-  else {
-    return (
-      await client<{ category_id: number }>('categories', 'POST', {
-        body: {
-          name: testCategoryName,
-          description: 'Category for Lunchmoney Amazon Matcher testing',
-          exclude_from_budget: true,
-          exclude_from_totals: true
-        }
-      })
-    ).category_id;
-  }
 }
 
 export async function updateLMTransaction(
