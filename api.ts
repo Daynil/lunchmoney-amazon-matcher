@@ -105,13 +105,15 @@ export async function client<T>(
   }
 }
 
-// TODO: add start and end dates, with input from command line args
-export async function getLMAmazonTransactions(): Promise<
-  LunchmoneyTransaction[]
-> {
+export async function getLMAmazonTransactions(
+  startDate: string,
+  endDate: string
+): Promise<LunchmoneyTransaction[]> {
   return await client<LunchmoneyTransaction[]>('transactions', 'GET', {
     queryParams: {
-      tag_id: process.env.AMAZON_TAG_ID
+      tag_id: process.env.AMAZON_TAG_ID,
+      start_date: startDate,
+      end_date: endDate
     }
   });
 }

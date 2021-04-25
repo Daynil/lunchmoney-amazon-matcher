@@ -19,6 +19,8 @@
     "date-fns": "^2.19.0",
     "dotenv": "^8.2.0",
     "highlight.js": "^10.4.0",
+    "inquirer": "^8.0.0",
+    "jarvis": "0.0.1",
     "jest": "^26.6.3",
     "node-fetch": "^2.6.1",
     "query-string": "^7.0.0",

@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { format, parse } from 'date-fns';
 import { LM_API_MAX_NOTE_LENGTH } from './api';
 import { AmazonOrder } from './script';
 
@@ -159,4 +160,34 @@ function joinNoteFixedAndDetails(
   noteDetails: string[]
 ): string {
   return noteFixed.map((note, i) => `${note}: ${noteDetails[i]}`).join('; ');
+}
+
+export function dateFormatter(
+  date: string | Date,
+  fromFormat: 'lunchmoney' | 'amazon' | 'native',
+  toFormat: 'lunchmoney' | 'amazon' | 'native'
+): string {
+  const lunchmoneyFormat = 'yyyy-MM-dd';
+  const amazonFormat = 'MM/dd/yyyy';
+
+  const fromFormatStr =
+    fromFormat === 'lunchmoney' ? lunchmoneyFormat : amazonFormat;
+  const toFormatStr =
+    toFormat === 'lunchmoney' ? lunchmoneyFormat : amazonFormat;
+
+  let parsed: Date;
+  if (typeof date === 'string') {
+    parsed = parse(date, fromFormatStr, new Date());
+    return format(parsed, toFormatStr);
+  } else {
+    return format(date, toFormatStr);
+  }
+
+  // if (toFormat === 'lunchmoney') {
+  //   parsed = parse(date, amazonFormat, new Date());
+  //   return format(parsed, lunchmoneyFormat);
+  // } else if (toFormat === 'amazon') {
+  //   parsed = parse(date, lunchmoneyFormat, new Date());
+  //   return format(parsed, amazonFormat);
+  // }
 }

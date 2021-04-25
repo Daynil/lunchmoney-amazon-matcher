@@ -2,7 +2,6 @@ import chalk from 'chalk';
 import { LunchmoneyTransaction } from './api';
 import {
   AmazonOrder,
-  dateFormatter,
   enrichLMOrdersWithAmazonOrderDetails,
   groupAmazonOrders,
   GroupedAmazonOrder,
@@ -14,7 +13,7 @@ import {
   resetTestTransactions,
   TestAmazonOrders
 } from './test-utils';
-import { generateTransactionNote } from './util';
+import { dateFormatter, generateTransactionNote } from './util';
 
 /**
  * Unit tests
@@ -22,8 +21,16 @@ import { generateTransactionNote } from './util';
 test('manages formatted dates', () => {
   const fromAmazon = '03/05/2021';
   const fromLunchmoney = '2021-03-05';
-  expect(dateFormatter(fromAmazon, 'lunchmoney')).toEqual(fromLunchmoney);
-  expect(dateFormatter(fromLunchmoney, 'amazon')).toEqual(fromAmazon);
+  const fromNative = new Date(2021, 2, 5);
+  expect(dateFormatter(fromAmazon, 'amazon', 'lunchmoney')).toEqual(
+    fromLunchmoney
+  );
+  expect(dateFormatter(fromLunchmoney, 'lunchmoney', 'amazon')).toEqual(
+    fromAmazon
+  );
+  expect(dateFormatter(fromNative, 'native', 'lunchmoney')).toEqual(
+    fromLunchmoney
+  );
 });
 
 test('missing headers throws properly', async () => {

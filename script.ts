@@ -1,12 +1,16 @@
 import csv from 'csv-parser';
-import { format, parse } from 'date-fns';
 import fs from 'fs';
 import {
   LunchmoneyTransaction,
   MatchedLunchmoneyTransaction,
   updateLMTransaction
 } from './api';
-import { generateTransactionNote, logger, replaceAll } from './util';
+import {
+  dateFormatter,
+  generateTransactionNote,
+  logger,
+  replaceAll
+} from './util';
 
 export interface AmazonOrder {
   Order_Date: string;
@@ -33,23 +37,6 @@ export interface GroupedAmazonOrder {
   Order_ID: string;
   Order_Total: number;
   OrderItems: AmazonOrder[];
-}
-
-export function dateFormatter(
-  dateString: string,
-  toFormat: 'lunchmoney' | 'amazon'
-): string {
-  const lunchmoneyFormat = 'yyyy-MM-dd';
-  const amazonFormat = 'MM/dd/yyyy';
-
-  let parsed: Date;
-  if (toFormat === 'lunchmoney') {
-    parsed = parse(dateString, amazonFormat, new Date());
-    return format(parsed, lunchmoneyFormat);
-  } else {
-    parsed = parse(dateString, lunchmoneyFormat, new Date());
-    return format(parsed, amazonFormat);
-  }
 }
 
 function getExpectedHeaders(): Promise<string[]> {
@@ -84,7 +71,7 @@ export async function parseAmazonOrderCSV(
               const parsed = new Date(value);
               if (isNaN(parsed.getTime()))
                 return reject(`Value ${value} cannot be parsed to date`);
-              return dateFormatter(value, 'lunchmoney');
+              return dateFormatter(value, 'amazon', 'lunchmoney');
             }
             if (
               [
@@ -202,21 +189,14 @@ export async function enrichLMOrdersWithAmazonOrderDetails(
       notes: generateTransactionNote(amazonGroupedOrder.OrderItems)
     };
   });
+  let counter = 0;
   for await (const lmTransaction of enrichedLMTransactions) {
     try {
       await updateLMTransaction(lmTransaction);
+      counter++;
     } catch (error) {
       logger(error, 'error');
     }
   }
-}
-
-export async function start() {
-  // const parsed = await parseAmazonOrderCSV(
-  //   // './order-csv/01-Jan-2021_to_27-Mar-2021.csv'
-  //   './test-csv/test_orders.csv'
-  // );
-  // // console.log(parsed[parsed.length - 1]);
-  // console.log(parsed);
-  // await resetTestTransactions();
+  return counter;
 }

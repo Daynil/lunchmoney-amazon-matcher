@@ -48,5 +48,5 @@ Thumbs.db
 ormconfig.json
 
 # Amazon order data CSVs and cached data
-/order-csv
+/order-csv/*
 testTransactions.json
