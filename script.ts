@@ -8,6 +8,7 @@ import {
 import {
   dateFormatter,
   generateTransactionNote,
+  lmTransactionDateCloseToOrder,
   logger,
   replaceAll
 } from './util';
@@ -152,7 +153,7 @@ export function matchLunchmoneyToAmazon(
     const lmTransaction = lmTransactions[i];
     const matchingAmazonGroupedOrders = groupedAmazonOrders.filter(
       (d) =>
-        d.Order_Date === lmTransaction.date &&
+        lmTransactionDateCloseToOrder(d.Order_Date, lmTransaction.date) &&
         d.Order_Total === parseFloat(lmTransaction.amount)
     );
     // Gracefully skip missing matches, but warn for manual intervention

@@ -109,13 +109,19 @@ export async function getLMAmazonTransactions(
   startDate: string,
   endDate: string
 ): Promise<LunchmoneyTransaction[]> {
-  return await client<LunchmoneyTransaction[]>('transactions', 'GET', {
-    queryParams: {
-      tag_id: process.env.AMAZON_TAG_ID,
-      start_date: startDate,
-      end_date: endDate
-    }
-  });
+  return (
+    await client<{ transactions: LunchmoneyTransaction[] }>(
+      'transactions',
+      'GET',
+      {
+        queryParams: {
+          tag_id: process.env.AMAZON_TAG_ID,
+          start_date: startDate,
+          end_date: endDate
+        }
+      }
+    )
+  ).transactions;
 }
 
 export async function getLMTransaction(

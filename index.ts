@@ -33,7 +33,7 @@ cmdr
         );
         return;
       } else if (startDate && !endDate) {
-        endDate = dateFormatter(new Date(), 'native', 'lunchmoney');
+        endDate = dateFormatter(new Date(), 'native', 'lunchmoney') as string;
       } else if (!startDate || !endDate) {
         // Default to current month range
         const today = new Date();
@@ -42,8 +42,12 @@ cmdr
           today.getMonth(),
           1
         );
-        startDate = dateFormatter(firstDayOfMonth, 'native', 'lunchmoney');
-        endDate = dateFormatter(today, 'native', 'lunchmoney');
+        startDate = dateFormatter(
+          firstDayOfMonth,
+          'native',
+          'lunchmoney'
+        ) as string;
+        endDate = dateFormatter(today, 'native', 'lunchmoney') as string;
       }
       if (!fs.existsSync('./order-csv/amazon_order_details.csv')) {
         logger(

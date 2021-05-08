@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { format, parse } from 'date-fns';
+import { differenceInDays, format, parse } from 'date-fns';
 import { LM_API_MAX_NOTE_LENGTH } from './api';
 import { AmazonOrder } from './script';
 
@@ -166,9 +166,9 @@ export function dateFormatter(
   date: string | Date,
   fromFormat: 'lunchmoney' | 'amazon' | 'native',
   toFormat: 'lunchmoney' | 'amazon' | 'native'
-): string {
+): string | Date {
   const lunchmoneyFormat = 'yyyy-MM-dd';
-  const amazonFormat = 'MM/dd/yyyy';
+  const amazonFormat = 'MM/dd/yy';
 
   const fromFormatStr =
     fromFormat === 'lunchmoney' ? lunchmoneyFormat : amazonFormat;
@@ -178,16 +178,30 @@ export function dateFormatter(
   let parsed: Date;
   if (typeof date === 'string') {
     parsed = parse(date, fromFormatStr, new Date());
+    if (toFormat === 'native') return parsed;
     return format(parsed, toFormatStr);
   } else {
     return format(date, toFormatStr);
   }
+}
 
-  // if (toFormat === 'lunchmoney') {
-  //   parsed = parse(date, amazonFormat, new Date());
-  //   return format(parsed, lunchmoneyFormat);
-  // } else if (toFormat === 'amazon') {
-  //   parsed = parse(date, lunchmoneyFormat, new Date());
-  //   return format(parsed, amazonFormat);
-  // }
+/**
+ * Credit card transaction date is often days after initial order.
+ * Check if the transaction is within a threshold of the order date.
+ */
+export function lmTransactionDateCloseToOrder(
+  orderDate: string,
+  lmTransactionDate: string,
+  thresholdDays?: number
+): boolean {
+  if (!thresholdDays) thresholdDays = 4;
+  const lmTransactionDateD = dateFormatter(
+    lmTransactionDate,
+    'lunchmoney',
+    'native'
+  ) as Date;
+  const orderDateD = dateFormatter(orderDate, 'lunchmoney', 'native') as Date;
+  return (
+    Math.abs(differenceInDays(orderDateD, lmTransactionDateD)) <= thresholdDays
+  );
 }

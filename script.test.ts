@@ -13,13 +13,17 @@ import {
   resetTestTransactions,
   TestAmazonOrders
 } from './test-utils';
-import { dateFormatter, generateTransactionNote } from './util';
+import {
+  dateFormatter,
+  generateTransactionNote,
+  lmTransactionDateCloseToOrder
+} from './util';
 
 /**
  * Unit tests
  */
 test('manages formatted dates', () => {
-  const fromAmazon = '03/05/2021';
+  const fromAmazon = '03/05/21';
   const fromLunchmoney = '2021-03-05';
   const fromNative = new Date(2021, 2, 5);
   expect(dateFormatter(fromAmazon, 'amazon', 'lunchmoney')).toEqual(
@@ -31,6 +35,24 @@ test('manages formatted dates', () => {
   expect(dateFormatter(fromNative, 'native', 'lunchmoney')).toEqual(
     fromLunchmoney
   );
+  expect(dateFormatter(fromLunchmoney, 'lunchmoney', 'native')).toEqual(
+    fromNative
+  );
+});
+
+test('transaction date threshold works', () => {
+  let orderDate = '2021-04-28';
+  let lmTransactionDate = '2021-05-02';
+  expect(
+    lmTransactionDateCloseToOrder(orderDate, lmTransactionDate)
+  ).toBeTruthy();
+  orderDate = '2021-02-01';
+  expect(
+    lmTransactionDateCloseToOrder(orderDate, lmTransactionDate)
+  ).toBeFalsy();
+  expect(
+    lmTransactionDateCloseToOrder(orderDate, lmTransactionDate, 300)
+  ).toBeTruthy();
 });
 
 test('missing headers throws properly', async () => {
