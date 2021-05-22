@@ -7,7 +7,6 @@ import {
 } from './script';
 import { dateFormatter, logger } from './util';
 
-// TODO: actually run this! Start with 1 month
 /**
  * E.g. npm start -- match -s "2021-01-01" -e "2021-12-31"
  */
