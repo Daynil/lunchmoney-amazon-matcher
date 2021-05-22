@@ -194,7 +194,7 @@ export function lmTransactionDateCloseToOrder(
   lmTransactionDate: string,
   thresholdDays?: number
 ): boolean {
-  if (!thresholdDays) thresholdDays = 30;
+  if (!thresholdDays) thresholdDays = 15;
   const lmTransactionDateD = dateFormatter(
     lmTransactionDate,
     'lunchmoney',
