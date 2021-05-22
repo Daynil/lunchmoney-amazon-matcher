@@ -8,11 +8,13 @@ Lunch Money Amazon Matcher can help!
 
 This code will attempt to match Lunch Money Amazon transactions to Amazon orders from your Amazon order history by the total cost of the order (including multi-item orders) within a [date range](https://github.com/Daynil/lunchmoney-amazon-matcher/blob/master/util.ts#L192) of the order date (15 days by default).
 
-If a match is found, a note is set for the Lunch Money transaction which includes the "Category" set by Amazon (e.g. Cofee, Shirt, Pantry Supplies, etc.), as well as a complete discription of the item.
+If a match is found, a note is set for the Lunch Money transaction which includes the "Category" set by Amazon (e.g. Coffee, Shirt, Pantry Supplies, etc.), as well as a complete discription of the item.
 
-If the matched order is a multi-item order, each item will be listed as above, including the cost of each individual item in the order. If the description exceeds Lunch Money's note length limit (350 characters), and an algorithm ([generateTransactionNote](https://github.com/Daynil/lunchmoney-amazon-matcher/blob/master/util.ts#L58)) will intelligently truncate the note for maximum readbility. For example:
+If the matched order is a multi-item order, each item will be listed as above, including the cost of each individual item in the order. If the description exceeds Lunch Money's note length limit (350 characters), and [an algorithm](https://github.com/Daynil/lunchmoney-amazon-matcher/blob/master/util.ts#L58) will intelligently truncate the note for maximum readbility. For example:
 
-_Item 1: $6.99: (COSMETIC_CASE): OTO 6 Pack Travel Size Plastic Squeeze Bottles for Liquids, 30ml/1 Fl. Oz TSA Approved Makeup Toiletry Cosmetic Containers; Item 2: $7.99: (COSMETIC_CASE): Silicone Travel Bottles, Vonpri Leak Proof Squeezable Refillable Travel Accessories Toiletries Containers Travel Size C..._
+_Item 1: $7.51: (SHIRT): Next Level Mens T-Shirt; Item 2: $7.99: (COSMETIC_CASE): Silicone Travel Bottles, Vonpri Leak Proof Squeezable Refillable Travel Accessories Toiletries Containers Travel Size C..._
+
+Now that each Amazon transaction has a detailed description of each order, you can easily categorize them more appropriately!
 
 ## Usage
 
@@ -32,7 +34,7 @@ Clone this repo locally and install dependencies.
 
 Create a `.env` file in the base directory. Create 2 environment variables, one called `LUNCHMONEY_ACCESS_TOKEN` and one called `AMAZON_TAG_ID` and set them to the appropriate values.
 
-Go to your Amazon account and download your order history report for the time period you'd like to use. Be sure to go back at least 15 days from the starting period of the Lunch Money Amazon transactions you'd like to match (order history has the order date, but the transaction date is the date your card was charged, which can be several days later).
+Go to your Amazon account and [download your order history report](https://www.amazon.com/gp/b2b/reports/) for the time period you'd like to use. Be sure to go back at least 15 days from the starting period of the Lunch Money Amazon transactions you'd like to match (order history has the order date, but the transaction date is the date your card was charged, which can be several days later).
 
 Create a local folder called `order-csv` in the base directory of the code, place your order history there, and name it `amazon_order_details.csv`.
 
@@ -56,4 +58,4 @@ Unfortunately, this process isn't perfect due to the nature of interacting betwe
 - 2 different Amazon orders with identical total paid amounts within the same transaction match threshold ([15 day period by default](https://github.com/Daynil/lunchmoney-amazon-matcher/blob/master/util.ts#L192)) cannot be uniquely identified, so they will be skipped.
 - If an Amazon order is using an Amazon credit card, paying for part or all of a transaction with credit card rewards points will cause the transaction not to match.
 - If an Amazon order had a "coupon" applied, it will not match. Amazon's order export does not account for coupon discounts and only shows item totals, while the Lunch Money transaction would show the amount after the coupon is applied.
-- It is theoretically possible for a transaction to be mismatched if two transactions both payed with multiple payment methods and/or partly with reward points and the wrong one added up to the matching amount.
+- It is theoretically possible for a transaction to be mismatched if two transactions both payed with multiple payment methods and/or partly with reward points and the wrong one added up to the matching amount, though this is probably very unlikely.
