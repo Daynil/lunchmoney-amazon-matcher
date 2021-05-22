@@ -183,8 +183,18 @@ export async function enrichLMOrdersWithAmazonOrderDetails(
   amazonOrders: AmazonOrder[]
 ) {
   const matched = matchLunchmoneyToAmazon(lmTransactions, amazonOrders);
+  let skippedCounter = 0;
   const enrichedLMTransactions = matched.map((matchedTransaction) => {
     const { amazonGroupedOrder, lmTransaction } = matchedTransaction;
+    // Skip generating notes if we already created a manual note for a transaction
+    if (lmTransaction.notes) {
+      logger(
+        `Note already present on matched Lunchmoney transaction: ${lmTransaction.date} $${lmTransaction.amount}. Skipping...`,
+        'info'
+      );
+      skippedCounter++;
+      return lmTransaction;
+    }
     return {
       ...lmTransaction,
       notes: generateTransactionNote(amazonGroupedOrder.OrderItems)
@@ -199,5 +209,5 @@ export async function enrichLMOrdersWithAmazonOrderDetails(
       logger(error, 'error');
     }
   }
-  return counter;
+  return counter - skippedCounter;
 }
