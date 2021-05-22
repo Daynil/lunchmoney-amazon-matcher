@@ -6,11 +6,11 @@ Lunch Money Amazon Matcher can help!
 
 ## How it works
 
-This code will attempt to match Lunch Money Amazon transactions to Amazon orders from your Amazon order history by the total cost of the order (including multi-item orders) within a [date range](https://github.com/Daynil/lunchmoney-amazon-matcher/blob/master/util.ts#L192) of the order date (15 days by default).
+This code will attempt to match Lunch Money Amazon transactions to Amazon orders from your Amazon order history by the total cost of the order (including multi-item orders) within a [date range](https://github.com/Daynil/lunchmoney-amazon-matcher/blob/master/src/util.ts#L192) of the order date (15 days by default).
 
 If a match is found, a note is set for the Lunch Money transaction which includes the "Category" set by Amazon (e.g. Coffee, Shirt, Pantry Supplies, etc.), as well as a complete discription of the item.
 
-If the matched order is a multi-item order, each item will be listed as above, including the cost of each individual item in the order. If the description exceeds Lunch Money's note length limit (350 characters), and [an algorithm](https://github.com/Daynil/lunchmoney-amazon-matcher/blob/master/util.ts#L58) will intelligently truncate the note for maximum readbility. For example:
+If the matched order is a multi-item order, each item will be listed as above, including the cost of each individual item in the order. If the description exceeds Lunch Money's note length limit (350 characters), and [an algorithm](https://github.com/Daynil/lunchmoney-amazon-matcher/blob/master/src/util.ts#L58) will intelligently truncate the note for maximum readbility. For example:
 
 _Item 1: $7.51: (SHIRT): Next Level Mens T-Shirt; Item 2: $7.99: (COSMETIC_CASE): Silicone Travel Bottles, Vonpri Leak Proof Squeezable Refillable Travel Accessories Toiletries Containers Travel Size C..._
 
@@ -55,7 +55,7 @@ Unfortunately, this process isn't perfect due to the nature of interacting betwe
 - If an Amazon order was payed for with multiple payment methods, or payed with a gift card, the match will fail for that transaction.
   - Gift cards are not linked to Lunch Money, so unless they are manually entered into Lunch Money, any transaction either solely or partly paid with a gift card will not match.
   - Amazon orders paid with multiple payment types (e.g. 2 different credit cards) will have separate transactions in Lunch Money, so they will not match with Amazon order totals.
-- 2 different Amazon orders with identical total paid amounts within the same transaction match threshold ([15 day period by default](https://github.com/Daynil/lunchmoney-amazon-matcher/blob/master/util.ts#L192)) cannot be uniquely identified, so they will be skipped.
+- 2 different Amazon orders with identical total paid amounts within the same transaction match threshold ([15 day period by default](https://github.com/Daynil/lunchmoney-amazon-matcher/blob/master/src/util.ts#L192)) cannot be uniquely identified, so they will be skipped.
 - If an Amazon order is using an Amazon credit card, paying for part or all of a transaction with credit card rewards points will cause the transaction not to match.
 - If an Amazon order had a "coupon" applied, it will not match. Amazon's order export does not account for coupon discounts and only shows item totals, while the Lunch Money transaction would show the amount after the coupon is applied.
 - It is theoretically possible for a transaction to be mismatched if two transactions both payed with multiple payment methods and/or partly with reward points and the wrong one added up to the matching amount, though this is probably very unlikely.
